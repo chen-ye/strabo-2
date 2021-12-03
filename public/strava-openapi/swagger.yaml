@@ -99,78 +99,78 @@ paths:
           description: Unexpected error.
           schema:
             { $ref: "https://developers.strava.com/swagger/fault.json#/Fault" }
-    put:
-      operationId: updateLoggedInAthlete
-      summary: Update Athlete
-      description:
-        Update the currently authenticated athlete. Requires profile:write
-        scope.
-      consumes: [multipart/form-data]
-      tags: [Athletes]
-      parameters:
-        - {
-            name: weight,
-            in: path,
-            description: The weight of the athlete in kilograms.,
-            required: true,
-            type: number,
-            format: float,
-          }
-      responses:
-        "200":
-          description: Profile information for the authenticated athlete.
-          schema:
-            {
-              $ref: "https://developers.strava.com/swagger/athlete.json#/DetailedAthlete",
-            }
-          examples:
-            application/json:
-              id: 1
-              username: marianne_v
-              resource_state: 3
-              firstname: Marianne
-              lastname: V.
-              city: San Francisco
-              state: CA
-              country: US
-              sex: F
-              premium: true
-              created_at: "2017-11-14T02:30:05Z"
-              updated_at: "2018-02-06T19:32:20Z"
-              badge_type_id: 4
-              profile_medium: https://xxxxxx.cloudfront.net/pictures/athletes/1234567898765509876/1234567898765509876/2/medium.jpg
-              profile: https://xxxxx.cloudfront.net/pictures/athletes/1234567898765509876/1234567898765509876/2/large.jpg
-              friend: null
-              follower: null
-              follower_count: 5
-              friend_count: 5
-              mutual_friend_count: 0
-              athlete_type: 1
-              date_preference: "%m/%d/%Y"
-              measurement_preference: feet
-              clubs: []
-              ftp: null
-              weight: 0
-              bikes:
-                - {
-                    id: b1234567898765509876,
-                    primary: true,
-                    name: EMC,
-                    resource_state: 2,
-                    distance: 0,
-                  }
-              shoes:
-                - {
-                    id: g1234567898765509876,
-                    primary: true,
-                    name: adidas,
-                    resource_state: 2,
-                    distance: 4904,
-                  }
-        default:
-          description: Unexpected error.
-          schema:
-            { $ref: "https://developers.strava.com/swagger/fault.json#/Fault" }
+    # put:
+    #   operationId: updateLoggedInAthlete
+    #   summary: Update Athlete
+    #   description:
+    #     Update the currently authenticated athlete. Requires profile:write
+    #     scope.
+    #   consumes: [multipart/form-data]
+    #   tags: [Athletes]
+    #   parameters:
+    #     - {
+    #         name: weight,
+    #         in: path,
+    #         description: The weight of the athlete in kilograms.,
+    #         required: true,
+    #         type: number,
+    #         format: float,
+    #       }
+    #   responses:
+    #     "200":
+    #       description: Profile information for the authenticated athlete.
+    #       schema:
+    #         {
+    #           $ref: "https://developers.strava.com/swagger/athlete.json#/DetailedAthlete",
+    #         }
+    #       examples:
+    #         application/json:
+    #           id: 1
+    #           username: marianne_v
+    #           resource_state: 3
+    #           firstname: Marianne
+    #           lastname: V.
+    #           city: San Francisco
+    #           state: CA
+    #           country: US
+    #           sex: F
+    #           premium: true
+    #           created_at: "2017-11-14T02:30:05Z"
+    #           updated_at: "2018-02-06T19:32:20Z"
+    #           badge_type_id: 4
+    #           profile_medium: https://xxxxxx.cloudfront.net/pictures/athletes/1234567898765509876/1234567898765509876/2/medium.jpg
+    #           profile: https://xxxxx.cloudfront.net/pictures/athletes/1234567898765509876/1234567898765509876/2/large.jpg
+    #           friend: null
+    #           follower: null
+    #           follower_count: 5
+    #           friend_count: 5
+    #           mutual_friend_count: 0
+    #           athlete_type: 1
+    #           date_preference: "%m/%d/%Y"
+    #           measurement_preference: feet
+    #           clubs: []
+    #           ftp: null
+    #           weight: 0
+    #           bikes:
+    #             - {
+    #                 id: b1234567898765509876,
+    #                 primary: true,
+    #                 name: EMC,
+    #                 resource_state: 2,
+    #                 distance: 0,
+    #               }
+    #           shoes:
+    #             - {
+    #                 id: g1234567898765509876,
+    #                 primary: true,
+    #                 name: adidas,
+    #                 resource_state: 2,
+    #                 distance: 4904,
+    #               }
+    #     default:
+    #       description: Unexpected error.
+    #       schema:
+    #         { $ref: "https://developers.strava.com/swagger/fault.json#/Fault" }
   /athlete/zones:
     get:
       operationId: getLoggedInAthleteZones
@@ -2224,6 +2224,89 @@ paths:
           description: Unexpected error.
           schema:
             { $ref: "https://developers.strava.com/swagger/fault.json#/Fault" }
+  /push_subscriptions:
+    x-ms-notification-content:
+      description: New Event
+      schema:
+        type: object
+        properties:
+          aspect_type:
+            type: string
+            description: Always "create," "update," or "delete."
+            enum:
+              - create
+              - update
+              - delete
+          event_time:
+            type: integer
+            description: The time that the event occurred.
+          object_id:
+            type: integer
+            description: For activity events, the activity's ID. For athlete events, the athlete's ID.
+          object_type:
+            type: string
+            description: Always either "activity" or "athlete."
+            enum:
+              - activity
+              - athlete
+          owner_id:
+            type: integer
+            description: The athlete's ID.
+          subscription_id:
+            type: integer
+            description: The push subscription ID that is receiving this event.
+          updates:
+            type: object
+            properties:
+              title: { type: string, description: title }
+              type: { type: string, description: type }
+              private:
+                { type: string, description: private, enum: ["true", "false"] }
+              authorized:
+                { type: string, description: authorized, enum: ["false"] }
+            description: updates
+    post:
+      responses:
+        "200":
+          description: The subscription creation response.
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+        default:
+          description: Unexpected error.
+          schema:
+            { $ref: "https://developers.strava.com/swagger/fault.json#/Fault" }
+      consumes:
+        - multipart/form-data
+      summary: Push New Event Subscription
+      operationId: Push-New-Event
+      x-ms-visibility: important
+      x-ms-trigger: single
+      parameters:
+        - name: client_id
+          in: formData
+          required: true
+          type: integer
+          description: Strava API application ID
+        - name: client_secret
+          in: formData
+          required: true
+          type: string
+          description: Strava API application secret
+        - name: callback_url
+          in: formData
+          required: true
+          type: string
+          description: Address where webhook events will be sent; maximum length of 255 characters
+          x-ms-notification-url: true
+          x-ms-visibility: internal
+        - name: verify_token
+          in: formData
+          required: true
+          type: string
+          description: String chosen by the application owner for client security. An identical string will be included in the validation request made by Strava's subscription service.
 definitions: {}
 parameters:
   page:
